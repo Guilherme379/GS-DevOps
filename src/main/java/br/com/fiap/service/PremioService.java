@@ -1,17 +1,24 @@
 package br.com.fiap.service;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Service;
 
+import br.com.fiap.controller.PremioController;
 import br.com.fiap.model.PessoaFisica;
 import br.com.fiap.model.Premio;
 import br.com.fiap.repository.PessoaFisicaRepository;
 import br.com.fiap.repository.PremioRepository;
 import br.com.fiap.request.PremioRequest;
+import br.com.fiap.response.PremioResponse;
 import jakarta.validation.ValidationException;
 
 @Service
@@ -27,6 +34,23 @@ public class PremioService {
 		this.premioRepository = premioRepository;
 		this.pessoaFisicaService = pessoaFisicaService;
 		this.pessoaFisicaRepository = pessoaFisicaRepository;
+	}
+	
+	public Page<PremioResponse> buscarPremios() {
+		return premioRepository.findAll(paginacaoPersonalizada).map(premio -> toDTO(premio,true));
+	}
+	
+	public PremioResponse buscarPremioResponse(int idPremio) {
+		Premio premio = this.buscarPremio(idPremio);
+		PremioResponse premioResponse = PremioResponse.builder()
+				.idPremio(premio.getIdPremio())
+				.descricaoPremio(premio.getDescricaoPremio())
+				.produto(premio.getProduto())
+				.sku(premio.getSku())
+				.xpPremio(premio.getXpPremio())
+				.pessoaFisica(premio.getPessoaFisica())
+				.build();
+		return premioResponse;
 	}
 
 	public Premio buscarPremio(int idPremio) {
@@ -62,9 +86,8 @@ public class PremioService {
 		return "Premio excluído";
 	}
 	
-	//Acesso aos prêmios
+	//Método de acesso aos prêmios
 	public String acessoPremio(int idPremio, int idPessoaFisica) {
-		//xp da pessoa == xp do premio = premio liberado
 		Optional<PessoaFisica> pessoaFisica = pessoaFisicaRepository.findById(idPessoaFisica);
 		Optional<Premio> premio = premioRepository.findById(idPremio);
 		if (pessoaFisica.get().getXp() == premio.get().getXpPremio()) {
@@ -74,22 +97,19 @@ public class PremioService {
 		}
 	}
 	
-	
-	/*
-	private PremioRequest toDTO(Premio premio, boolean self) {
+	private PremioResponse toDTO(Premio premio, boolean self) {
 		Link link;
 		if (self) {
 			link = linkTo(methodOn(PremioController.class).buscarPremioPorId(premio.getIdPremio())).withSelfRel();
 		} else {
 			link = linkTo(methodOn(PremioController.class).buscarPremios()).withRel("Lista de Premios");
 		}
-		return new PremioRequest(
+		return new PremioResponse(
 				premio.getIdPremio(),
 				premio.getDescricaoPremio(),
 				premio.getProduto(),
 				premio.getSku(),
 				premio.getXpPremio(),
-				premio.getPessoaFisica(),
-				link);
-	}*/
+				premio.getPessoaFisica());
+	}
 }

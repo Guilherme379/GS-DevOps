@@ -6,6 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,6 +19,7 @@ import br.com.fiap.model.Ranking;
 import br.com.fiap.repository.PessoaJuridicaRepository;
 import br.com.fiap.repository.RankingRepository;
 import br.com.fiap.request.RankingRequest;
+import br.com.fiap.response.RankingResponse;
 
 @Service
 public class RankingService {
@@ -32,6 +34,20 @@ public class RankingService {
 		this.rankingRepository = rankingRepository;
 		this.pessoaJuridicaService = pessoaJuridicaService;
 		this.pessoaJuridicaRepository = pessoaJuridicaRepository;
+	}
+	
+	public Page<RankingResponse> buscarRankings() {
+		return rankingRepository.findAll(paginacaoPersonalizada).map(ranking -> toDTO(ranking, true));
+	}
+	
+	public RankingResponse buscarRankingResponse(int idRanking) {
+		Ranking ranking = this.buscarRanking(idRanking);
+		RankingResponse rankingResponse = RankingResponse.builder()
+				.idRanking(ranking.getIdRanking())
+				.posicao(ranking.getPosicao())
+				.pessoaJuridica(ranking.getPessoaJuridica())
+				.build();
+		return rankingResponse;
 	}
 
 	public Ranking buscarRanking(int idRanking) {
@@ -84,20 +100,17 @@ public class RankingService {
 	     return "Posição atualizada com sucesso";
 	}
 
-	
-	/*
-	private RankingRequest toDTO(Ranking ranking, boolean self) {
+	private RankingResponse toDTO(Ranking ranking, boolean self) {
 		Link link;
 		if (self) {
-			link = linkTo(methodOn(RankingController.class).buscarRankingPorId(ranking.getIdRanking()).withSelfRel());
+			link = linkTo(methodOn(RankingController.class).buscarRankingPorId(ranking.getIdRanking())).withSelfRel();
 		} else {
 			link = linkTo(methodOn(RankingController.class).buscarRankings()).withRel("Lista de Rankings");
 		}
-		return new RankingRequest(
+		return new RankingResponse(
 				ranking.getIdRanking(),
 				ranking.getPosicao(),
-				ranking.getPessoaJuridica(),
-				link);
-	}*/
+				ranking.getPessoaJuridica());
+	}
 
 }

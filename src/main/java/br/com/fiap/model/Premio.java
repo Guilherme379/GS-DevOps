@@ -7,8 +7,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -32,6 +36,7 @@ public class Premio implements Serializable {
 			name = "seq_premio", 
 			sequenceName = "seq_premio",
 			allocationSize = 1)
+	@Column(name = "id_premio")
 	private int idPremio;
 	
 	@NotNull(message = "A descricao não pode ser nulo")
@@ -50,10 +55,13 @@ public class Premio implements Serializable {
 	private String sku;
 	
 	@NotNull(message = "O XP não pode ser nulo")
-	@Size(min = 1, max = 99999)
+	@Min(1)
+	@Max(99999)
 	@Column(name = "xp_premio")
 	private int xpPremio;
 	
+	@ManyToOne
+    @JoinColumn(name = "id_pf", nullable = false)
 	private PessoaFisica pessoaFisica;
 	
 }

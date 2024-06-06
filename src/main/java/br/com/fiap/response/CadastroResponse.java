@@ -1,9 +1,12 @@
 package br.com.fiap.response;
 
+import lombok.Builder;
+
+@Builder
 public record CadastroResponse(
 		int idCadastro,
 		String nomeCompleto,
-		long telefone,
+		String telefone,
 		String emailCad,
 		String senhaCad) {
 

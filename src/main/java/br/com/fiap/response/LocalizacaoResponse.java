@@ -1,5 +1,8 @@
 package br.com.fiap.response;
 
+import lombok.Builder;
+
+@Builder
 public record LocalizacaoResponse(
 		int idLocalizacao,
 		String nomePraia,

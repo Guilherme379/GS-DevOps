@@ -1,18 +1,9 @@
 package br.com.fiap.service;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import java.util.Optional;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Service;
 
-import br.com.fiap.controller.LoginController;
-import br.com.fiap.exceptions.ValidationExceptionHandler;
 import br.com.fiap.model.Cadastro;
 import br.com.fiap.model.Login;
 import br.com.fiap.repository.CadastroRepository;
@@ -26,8 +17,6 @@ public class LoginService {
 	private LoginRepository loginRepository;
 	private CadastroService cadastroService;
 	private CadastroRepository cadastroRepository;
-	private static final Pageable paginacaoPersonalizada = PageRequest.of(0, 8, Sort.by("nomeCompleto").ascending());
-
 
 	public LoginService(LoginRepository loginRepository, CadastroService cadastroService, CadastroRepository cadastroRepository) {
 		this.loginRepository = loginRepository;
@@ -68,27 +57,15 @@ public class LoginService {
 		return "Login excluído";
 	}
 	
-	//Método confere a existência do email cadastrado para realização do login
+	//Método que confere a existência do email cadastrado para realização do login
 	public String conferirEmailCadastrado(int idCadastro, int idLogin) {
 		Optional<Cadastro> cadastro = cadastroRepository.findById(idCadastro);
 		Optional<Login> login = loginRepository.findById(idLogin);
 		if (cadastro.isPresent() && cadastro.get().getEmailCad() == login.get().getEmailLog()) {
-			return "Email cadastrado";
+			return "Email cadastrado, acesso liberado";
 		} else {
 			throw new ValidationException("Login não pôde ser realizado");
 		}
 	}
-	
-	
-	/*
-	private LoginRequest toDTO(Login login, boolean self) {
-		Link link;
-		if (self) {
-			link = linkTo(methodOn(LoginController.class).buscarLoginPorId(login.getIdLogin())).withSelfRel();
-		} else {
-			link = linkTo(methodOn(LoginController.class).buscarLogins()).withRel("Lista de Logins");
-		}
-		return new LoginRequest(login.getIdLogin(), login.getEmailLog(), login.getSenhaLog(), login.getDataHoraLogin(), login.getDataHoraLogout(), login.getCadastro(),
-				link);
-	}*/
+
 }

@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,7 @@ import br.com.fiap.controller.LocalizacaoController;
 import br.com.fiap.model.Localizacao;
 import br.com.fiap.repository.LocalizacaoRepository;
 import br.com.fiap.request.LocalizacaoRequest;
+import br.com.fiap.response.LocalizacaoResponse;
 
 @Service
 public class LocalizacaoService {
@@ -24,6 +26,24 @@ public class LocalizacaoService {
 
 	public LocalizacaoService(LocalizacaoRepository localizacaoRepository) {
 		this.localizacaoRepository = localizacaoRepository;
+	}
+	
+	public Page<LocalizacaoResponse> buscarLocalizacoes() {
+		return localizacaoRepository.findAll(paginacaoPersonalizada).map(localizacao -> toDTO(localizacao, true));
+	}
+	
+	public LocalizacaoResponse buscarLocalizacaoResponse(int idLocalizacao) {
+		Localizacao localizacao = this.buscarLocalizacao(idLocalizacao);
+		LocalizacaoResponse localizacaoResponse = LocalizacaoResponse.builder()
+				.idLocalizacao(localizacao.getIdLocalizacao())
+				.nomePraia(localizacao.getNomePraia())
+				.cidade(localizacao.getCidade())
+				.estado(localizacao.getEstado())
+				.pais(localizacao.getPais())
+				.latitudeAtual(localizacao.getLatitudeAtual())
+				.longitudeAtual(localizacao.getLongitudeAtual())
+				.build();
+		return localizacaoResponse;
 	}
 
 	public Localizacao buscarLocalizacao(int idLocalizacao) {
@@ -58,7 +78,8 @@ public class LocalizacaoService {
 		localizacaoRepository.delete(localizacao);
 		return "Localização excluída";
 	}
-/*	private LocalizacaoRequest toDTO(Localizacao localizacao, boolean self) {
+	
+	private LocalizacaoResponse toDTO(Localizacao localizacao, boolean self) {
 		Link link;
 		if (self) {
 			link = linkTo(methodOn(LocalizacaoController.class).buscarLocalizacaoPorId(localizacao.getIdLocalizacao()))
@@ -66,9 +87,9 @@ public class LocalizacaoService {
 		} else {
 			link = linkTo(methodOn(LocalizacaoController.class).buscarLocalizacoes()).withRel("Lista de Localizacoes");
 		}
-		return new LocalizacaoRequest(localizacao.getIdLocalizacao(), localizacao.getNomePraia(),
+		return new LocalizacaoResponse(localizacao.getIdLocalizacao(), localizacao.getNomePraia(),
 				localizacao.getCidade(), localizacao.getEstado(), localizacao.getPais(), localizacao.getLatitudeAtual(),
-				localizacao.getLongitudeAtual(), link);
-	}*/
+				localizacao.getLongitudeAtual());
+	}
 
 }

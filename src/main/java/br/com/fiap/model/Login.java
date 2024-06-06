@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +35,7 @@ public class Login implements Serializable{
 			name = "seq_login", 
 			sequenceName = "seq_login",
 			allocationSize = 1)
+	@Column(name = "id_login")
 	private int idLogin;
 	
 	@NotNull(message = "O email não pode ser nulo")
@@ -48,9 +51,11 @@ public class Login implements Serializable{
 	@Column(name = "data_hora_login")
 	private Timestamp dataHoraLogin;
 	
-	@Column(name = "data_hora_logout")
+	@Column(name = "data_logout")
 	private Timestamp dataHoraLogout;
 	
+	@ManyToOne
+    @JoinColumn(name = "id_cad", nullable = false)
 	private Cadastro cadastro;
 	
 }

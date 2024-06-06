@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Localizacao")
+@Table(name = "localizacao")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,6 +32,7 @@ public class Localizacao implements Serializable{
 			name = "seq_localizacao", 
 			sequenceName = "seq_localizacao",
 			allocationSize = 1)
+	@Column(name = "id_loc")
 	private int idLocalizacao;
 	
 	@Size(min = 1, max = 100)

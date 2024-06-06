@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,11 +14,10 @@ import org.springframework.stereotype.Service;
 
 import br.com.fiap.controller.PessoaJuridicaController;
 import br.com.fiap.model.Cadastro;
-import br.com.fiap.model.Login;
 import br.com.fiap.model.PessoaJuridica;
 import br.com.fiap.repository.PessoaJuridicaRepository;
-import br.com.fiap.request.LoginRequest;
 import br.com.fiap.request.PessoaJuridicaRequest;
+import br.com.fiap.response.PessoaJuridicaResponse;
 
 @Service
 public class PessoaJuridicaService {
@@ -29,6 +29,22 @@ public class PessoaJuridicaService {
 	public PessoaJuridicaService(PessoaJuridicaRepository pessoaJuridicaRepository, CadastroService cadastroService) {
 		this.pessoaJuridicaRepository = pessoaJuridicaRepository;
 		this.cadastroService = cadastroService;
+	}
+	
+	public Page<PessoaJuridicaResponse> buscarPessoasJuridicas() {
+		return pessoaJuridicaRepository.findAll(paginacaoPersonalizada).map(pessoaJuridica -> toDTO(pessoaJuridica, true));
+	}
+	
+	public PessoaJuridicaResponse buscarPessoaJuridicaResponse(int idPessoaJuridica) {
+		PessoaJuridica pessoaJuridica = this.buscarPessoaJuridica(idPessoaJuridica);
+		PessoaJuridicaResponse pessoaJuridicaResponse = PessoaJuridicaResponse.builder()
+				.idPessoaJuridica(pessoaJuridica.getIdPessoaJuridica())
+				.cnpj(pessoaJuridica.getCnpj())
+				.quantLixoColetada(pessoaJuridica.getQuantLixoColetada())
+				.dataColeta(pessoaJuridica.getDataColeta())
+				.cadastro(pessoaJuridica.getCadastro())
+				.build();
+		return pessoaJuridicaResponse;
 	}
 
 	public PessoaJuridica buscarPessoaJuridica(int idPessoaJuridica) {
@@ -61,20 +77,19 @@ public class PessoaJuridicaService {
 		pessoaJuridicaRepository.delete(pessoaJuridica);
 		return "Pessoa juridica excluída";
 	}
-	/*
-	private PessoaJuridicaRequest toDTO(PessoaJuridica pessoaJuridica, boolean self) {
+	
+	private PessoaJuridicaResponse toDTO(PessoaJuridica pessoaJuridica, boolean self) {
 		Link link;
 		if (self) {
-			link = linkTo(methodOn(PessoaJuridicaController.class).buscarPessoaFisicaPorId(pessoaJuridica.getIdPessoaJuridica())).withSelfRel();
+			link = linkTo(methodOn(PessoaJuridicaController.class).buscarPessoaJuridicaPorId(pessoaJuridica.getIdPessoaJuridica())).withSelfRel();
 		} else {
 			link = linkTo(methodOn(PessoaJuridicaController.class).buscarPessoasJuridicas()).withRel("Lista de pessoas juridicas");
 		}
-		return new PessoaJuridicaRequest(
+		return new PessoaJuridicaResponse(
 				pessoaJuridica.getIdPessoaJuridica(),
 				pessoaJuridica.getCnpj(),
 				pessoaJuridica.getQuantLixoColetada(),
 				pessoaJuridica.getDataColeta(),
-				pessoaJuridica.getCadastro(),
-				link);
-	}*/
+				pessoaJuridica.getCadastro());
+	}
 }

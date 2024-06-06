@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Cadastro_user")
+@Table(name = "cad_user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,6 +34,7 @@ public class Cadastro implements Serializable{
 			name = "seq_cadastro_user", 
 			sequenceName = "seq_cadastro_user",
 			allocationSize = 1)
+	@Column(name = "id_cad")
 	private int idCadastro;
 	
 	@NotNull(message = "O nome não pode ser nulo")
@@ -44,7 +45,7 @@ public class Cadastro implements Serializable{
 	@NotNull(message = "O telefone não pode ser nulo")
 	@Size(min = 11, max = 11)
 	@Column(name = "telefone")
-	private long telefone;
+	private String telefone;
 	
 	@NotNull(message = "O email não pode ser nulo")
 	@Size(min = 13, max = 60)

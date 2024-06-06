@@ -15,7 +15,7 @@ public record CadastroRequest(
 		@NotNull
         @NotBlank
         @Size(min = 11, max = 11)
-		long telefone,
+		String telefone,
 		@NotNull
         @NotBlank
         @Size(min = 13, max = 60)

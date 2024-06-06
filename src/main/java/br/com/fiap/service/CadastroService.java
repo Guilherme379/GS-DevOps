@@ -2,6 +2,7 @@ package br.com.fiap.service;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,7 +27,23 @@ public class CadastroService {
 	public CadastroService(CadastroRepository cadastroRepository) {
 		this.cadastroRepository = cadastroRepository;
 	}
+	
+	public Page<CadastroResponse> buscarCadastros() {
+		return cadastroRepository.findAll(paginacaoPersonalizada).map(cadastro -> toDTO (cadastro, true));
+	}
 
+	public CadastroResponse buscarCadastroResponse(int idCadastro) {
+		Cadastro cadastro = this.buscarCadastro(idCadastro);
+		CadastroResponse cadastroResponse = CadastroResponse.builder()
+				.idCadastro(cadastro.getIdCadastro())
+				.nomeCompleto(cadastro.getNomeCompleto())
+				.telefone(cadastro.getTelefone())
+				.emailCad(cadastro.getEmailCad())
+				.senhaCad(cadastro.getSenhaCad())
+				.build();
+		return cadastroResponse;
+	}
+	
 	public Cadastro buscarCadastro(int idCadastro) {
 		Optional<Cadastro> cadastro = cadastroRepository.findById(idCadastro);
 		return cadastro.get();
@@ -55,8 +72,8 @@ public class CadastroService {
 		cadastroRepository.delete(cadastro);
 		return "Cadastro excluído";
 	}
-/*
-	private CadastroRequest toDTO(Cadastro cadastro, boolean self) {
+
+	private CadastroResponse toDTO(Cadastro cadastro, boolean self) {
 		Link link;
 		if (self) {
 			link = linkTo(methodOn(CadastroController.class).buscarCadastroPorId(cadastro.getIdCadastro()))
@@ -64,8 +81,8 @@ public class CadastroService {
 		} else {
 			link = linkTo(methodOn(CadastroController.class).buscarCadastros()).withRel("Lista de Cadastros");
 		}
-		return new CadastroRequest(cadastro.getIdCadastro(), cadastro.getNomeCompleto(), cadastro.getTelefone(),
-				cadastro.getEmailCad(), cadastro.getSenhaCad(), link);
-	}*/
+		return new CadastroResponse(cadastro.getIdCadastro(), cadastro.getNomeCompleto(), cadastro.getTelefone(),
+				cadastro.getEmailCad(), cadastro.getSenhaCad());
+	}
 
 }

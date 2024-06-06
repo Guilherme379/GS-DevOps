@@ -1,10 +1,11 @@
 package br.com.fiap.service;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.Optional;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,8 +16,8 @@ import br.com.fiap.controller.PessoaFisicaController;
 import br.com.fiap.model.Cadastro;
 import br.com.fiap.model.PessoaFisica;
 import br.com.fiap.repository.PessoaFisicaRepository;
-import br.com.fiap.request.LoginRequest;
 import br.com.fiap.request.PessoaFisicaRequest;
+import br.com.fiap.response.PessoaFisicaResponse;
 
 @Service
 public class PessoaFisicaService {
@@ -28,6 +29,22 @@ public class PessoaFisicaService {
 	public PessoaFisicaService(PessoaFisicaRepository pessoaFisicaRepository, CadastroService cadastroService) {
 		this.pessoaFisicaRepository = pessoaFisicaRepository;
 		this.cadastroService = cadastroService;
+	}
+	
+	public Page<PessoaFisicaResponse> buscarPessoasFisicas() {
+		return pessoaFisicaRepository.findAll(paginacaoPersonalizada).map(pessoaFisica -> toDTO(pessoaFisica, true));
+	}
+	
+	public PessoaFisicaResponse buscarPessoaFisicaResponse(int idPessoaFisica) {
+		PessoaFisica pessoaFisica = this.buscarPessoaFisica(idPessoaFisica);
+		PessoaFisicaResponse pessoaFisicaResponse = PessoaFisicaResponse.builder()
+				.idPessoaFisica(pessoaFisica.getIdPessoaFisica())
+				.dataNasc(pessoaFisica.getDataNasc())
+				.cpf(pessoaFisica.getCpf())
+				.xp(pessoaFisica.getXp())
+				.cadastro(pessoaFisica.getCadastro())
+				.build();
+		return pessoaFisicaResponse;
 	}
 
 	public PessoaFisica buscarPessoaFisica(int idPessoaFisica) {
@@ -60,21 +77,20 @@ public class PessoaFisicaService {
 		pessoaFisicaRepository.delete(pessoaFisica);
 		return "Pessoa fisica excluída";
 	}
-	/*
-	private PessoaFisicaRequest toDTO(PessoaFisica pessoaFisica, boolean self) {
+	
+	private PessoaFisicaResponse toDTO(PessoaFisica pessoaFisica, boolean self) {
 		Link link;
 		if (self) {
 			link = linkTo(methodOn(PessoaFisicaController.class).buscarPessoaFisicaPorId(pessoaFisica.getIdPessoaFisica())).withSelfRel();
 		} else {
 			link = linkTo(methodOn(PessoaFisicaController.class).buscarPessoasFisicas()).withRel("Lista de pessoas fisicas");
 		}
-		return new PessoaFisicaRequest(
+		return new PessoaFisicaResponse(
 				pessoaFisica.getIdPessoaFisica(),
 				pessoaFisica.getDataNasc(),
 				pessoaFisica.getCpf(),
 				pessoaFisica.getXp(),
-				pessoaFisica.getCadastro(),
-				link);
-	}*/
+				pessoaFisica.getCadastro());
+	}
 	
 }

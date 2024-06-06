@@ -20,10 +20,10 @@ public record LoginRequest(
         @NotBlank
         @Size(min = 6, max = 50)
 		String senhaLog,
-		@Valid
-        @NotNull
         Timestamp dataHoraLogin,
         Timestamp dataHoraLogout,
+        @Valid
+        @NotNull
 		Cadastro cadastro,
 		Link link) {
 

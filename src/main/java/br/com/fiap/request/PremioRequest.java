@@ -4,6 +4,8 @@ import org.springframework.hateoas.Link;
 
 import br.com.fiap.model.PessoaFisica;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,7 +26,8 @@ public record PremioRequest(
 		String sku,
 		@NotNull
 		@NotBlank
-		@Size(min = 1, max = 99999)
+		@Min(1)
+		@Max(99999)
 		int xpPremio,
 		@Valid
         @NotNull
